@@ -1,13 +1,16 @@
 <template>
     <div>
       <h1 class="titulo">{{ h1 }}</h1>
+
+      <p v-show="mensagem" class="centralizado">{{ mensagem }}</p>
+
       <input type="search" class="filtro" v-on:input="filtro = $event.target.value" placeholder="Filtre o título">
       {{ filtro }}
       <ul class="lista-fotos">
         <li class="lista-fotos-item" v-for="foto of fotosComFiltro">
   
           <meu-painel :titulo="foto.titulo">
-            <imagem-responsiva :url="foto.url" :titulo="foto.titulo"></imagem-responsiva>
+            <imagem-responsiva v-my-transform:scale.animate="1.2" :url="foto.url" :titulo="foto.titulo"></imagem-responsiva>
             <botao tipo="button" rotulo="REMOVER" @botaoAtivado="remove(foto)" :confirmacao="false" estilo="perigo"></botao>
           </meu-painel>
   
@@ -33,7 +36,8 @@
       return {
         h1: "Alurapic",
         fotos: [],
-        filtro: ''
+        filtro: '',
+        mensagem: ''
       }
     },
   
@@ -51,7 +55,11 @@
     methods: {
       remove(foto) {
         
-          alert('remover a foto' + foto.titulo)
+          this.$http.delete(`http://localhost:3000/v1/fotos/${foto._id}`)
+          .then(() => this.mensagem = 'Foto removida com sucesso', err => {
+            console.log(err);
+            this.mensagem = 'Não foi possível remover a foto';
+          });
         
       }
     },
